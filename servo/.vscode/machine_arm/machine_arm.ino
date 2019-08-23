@@ -1,5 +1,3 @@
-#include <Arduino.h>
-#include <HardwareSerial.h>
 #include <Servo.h>
 const int pi = 3.1415926;
 
@@ -7,14 +5,15 @@ class Angle
 {
 public:
   Angle(byte a_m, byte a_n) : angMemory(a_m), angNow(a_n) {}
-  void changeAngle(byte ang); //角度制
+  Angle();
+  void changeAngle(byte ang);
   void angleReach(Servo &s);
-  byte angNow;  //角度制
+  byte angNow;
 
 private:
   byte angMemory;
 };
-void Angle::angleReach(Servo &s) //快速跳转舵机角度可能发生堵转，这个舵机需要缓慢调整才行
+void Angle::angleReach(Servo &s) //快速跳转脱机角度可能发生堵转，这个舵机需要缓慢调整才行
 {
   byte angleTmp = angMemory;
   bool turningUp = false;
@@ -28,7 +27,7 @@ void Angle::angleReach(Servo &s) //快速跳转舵机角度可能发生堵转，
   }
   if (turningUp)
   {
-    while (angleTmp <= angNow)
+    while (angleTmp < angNow)
     {
       angleTmp++;
       s.write(angleTmp);
@@ -37,7 +36,7 @@ void Angle::angleReach(Servo &s) //快速跳转舵机角度可能发生堵转，
   }
   else
   {
-    while (angleTmp >= angNow)
+    while (angleTmp > angNow)
     {
       angleTmp--;
       s.write(angleTmp);
@@ -45,7 +44,10 @@ void Angle::angleReach(Servo &s) //快速跳转舵机角度可能发生堵转，
     }
   }
 }
-
+Angle::Angle()
+{
+  
+}
 void Angle::changeAngle(byte ang)
 {
   angMemory = angNow;
@@ -54,8 +56,8 @@ void Angle::changeAngle(byte ang)
 
 Angle angle[6];    //舵机角度，与舵机名称一一对应,角度群部位相对轴的角度
 Servo servo[6];    //舵机名称，分别为0，1，2，3，4，5号，全代码统一
-double X, Y, Z, L; //以腰部舵机中心建立坐标系，直角坐标系与柱坐标系相互转换
-double Xp, Yp, Zp; //这是4号舵机转轴中心处的坐标值，运动学分析的核心数值
+double X = 0, Y = 0, Z = 0, L = 0; //以腰部舵机中心建立坐标系，直角坐标系与柱坐标系相互转换
+double Xp = 0, Yp = 0, Zp = 0; //这是4号舵机转轴中心处的坐标值，运动学分析的核心数值
 //X,Y,Z代表物体体心坐标，假设抓取足够准确，使体心坐标与机械手位于统一坐标平面之内
 byte angle_alpha; //机械手相对竖直方向z轴的俯仰角，逆时针方向，0-180,根据物体状态判别输入
 byte theta;       //底盘的极角，极轴以底盘舵机0˚方向为标准，theta为角度制，0-180˚
@@ -73,20 +75,19 @@ bool catch_valid = false;  //判断是否可以抓取，有输入才可以启动
 void setup()
 {
   //mega2560开发板串口
-  servo[0].attach(2); //底盘，控制旋转，改变X,Y
-  servo[1].attach(3); //腰部舵机，改变Y,Z
-  servo[2].attach(4); //肩部舵机，改变Y,Z
-  servo[3].attach(5); //大臂关节舵机,改变Y,Z
-  servo[4].attach(6); //小臂关节舵机,不改变X,Y,Z，仅改变俯仰角
-  servo[5].attach(7); //手部关节舵机,小幅度内改变X,Y,Z
+  servo[0].attach(2,500,2500); //底盘，控制旋转，改变X,Y
+  servo[1].attach(3,500,2500); //腰部舵机，改变Y,Z
+  servo[2].attach(4,500,2500); //肩部舵机，改变Y,Z
+  servo[3].attach(5,500,2500); //大臂关节舵机,改变Y,Z
+  servo[4].attach(6,500,2500); //小臂关节舵机,不改变X,Y,Z，仅改变俯仰角
+  servo[5].attach(7,500,2500); //手部关节舵机,小幅度内改变X,Y,Z
   //角度初始化,已调试
   angle[0] = {90, 90};
   angle[1] = {90, 90};
   angle[2] = {90, 90};
   angle[3] = {90, 90};
   angle[4] = {90, 90};
-  angle_alpha = 90;
-  angle[5] = {100, 100};
+  angle[5] = {0, 0};
   //写入角度
   for (int i = 0; i < 6; i++)
   {
@@ -109,8 +110,6 @@ void catchit() //控制机械手实现抓取
 {
   Y = L * sin(theta * pi / 180); //直角坐标与柱坐标之间的换算
   X = L * cos(theta * pi / 180);
-  angle[0].changeAngle(theta); //改变底座转角
-  angle[4].changeAngle(angle_alpha);
   Xp = X - hand_lenth * sin(angle_alpha * pi / 180);
   Yp = Y - hand_lenth * cos(angle_alpha * pi / 180);
   Zp = Z - up_to_land - hand_lenth * sin(angle_alpha * pi / 180); //减去相对高度差
@@ -122,13 +121,19 @@ void catchit() //控制机械手实现抓取
   float arc_angle1, arc_angle2; //弧度值暂存
 
   //理论计算结果代码化
-  m = Zp - arm_l3 * cos(angle_alpha * pi / 180); // 一般大于0
-  n = Yp - arm_l3 * sin(angle_alpha * pi / 180); // 一定大于0
+  m = Zp - arm_l3 * cos(angle_alpha); // 一般大于0
+  n = Yp - arm_l3 * sin(angle_alpha); // 一定大于0
   arc_angle2 = acos(m_square + n_square - arm1_square - arm2_square) / (2 * arm_l1 * arm_l2);
   angle[2].changeAngle((arc_angle2 / pi) * 180); // 解析法求解第二个主运动臂的角度
   arc_angle1 = asin((m * m + n * n + arm2_square - arm1_square) / (2 * arm_l2)) - atan(m / n) - arc_angle2;
   angle[1].changeAngle(arc_angle1 * 180 / pi);                           //解析法求解第一个主运动臂的角度
   angle[3].changeAngle(angle_alpha - angle[1].angNow - angle[2].angNow); //根据运动分析求解出最后的角度
+  Serial.print("The angle 1 is: ");
+  Serial.println(angle[1].angNow);
+  Serial.print("The angle 2 is: ");
+  Serial.println(angle[2].angNow);
+  Serial.print("The angle 3 is: ");
+  Serial.println(angle[3].angNow);
   for (int i = 0; i < 6; i++)
   {
     angle[i].angleReach(servo[i]);
@@ -175,15 +180,14 @@ void input_scheme() //调试时使用的向Serial中输入
     Serial.println(L);
     Serial.print("theta is: ");
     Serial.println(theta);
+    catch_valid = true;
   }
   else
   {
     catch_valid = false;
   }
   STORE = ""; //置为空，等待下一次读取
-  L_store = "";
-  theta_store = "";
-  Z_store = "";
+  
 }
 
 double stringToDouble(const String &str) //将string转换成为字符串，调试时使用
