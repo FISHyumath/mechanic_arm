@@ -1,0 +1,63 @@
+## 机械臂任务大纲
+
+### 情景假设
+
+> 假设你在一个电子产品工厂中实习，**公司需要一种*红色塑料球*作为一种消费电子产品的零件**。公司的老板非常节约成本，他看准了某塑料化工厂之前生产的一些未能成功售出货单中的产品。这些产品都被封存在一个巨大的仓库里。为了节约成本，老板需要在仓库中_“变废为宝”_。但是仓库实在是太大了，而且老板的任务时间非常紧迫，没有员工愿意干这种吃力而薪水低的苦活。所以，公司中的理工年轻人都在讨论如何设计一种**智能机械臂**，能够帮助公司挑选出符合要求的零件。
+
+#### 流水线
+
+``` flow
+sta=>start: 开始作业
+in1=>inputoutput: 搁置一个物体
+suboper1=>subroutine: 将其抓起来
+oper1=>operation: 超声测距
+oper2=>operation: 将其送至摄像头下
+suboper2=>subroutine: toF测距
+cond1=>condition: 它是球吗？
+cond2=>condition: 是红色吗？
+cond3=>condition: 还有任务吗？
+oper3=>operation: 放置球型框
+oper4=>operation: 放置红色特殊篮子
+oper6=>operation: 放到垃圾桶
+end=>end: 结束作业
+sta2=>start: 重新开始
+sta->in1->oper1->suboper1->oper2->suboper2->cond1
+cond1(yes)->cond2
+cond3(yes)->sta2
+cond2(yes)->oper3->cond3
+cond1(no)->oper6->cond3
+cond2(no)->oper4->cond3
+cond3(no)->end
+
+```
+
+### 任务分工
+
+公司中新来的三位学电子的年轻人对此抱有极高的热情和兴趣。他么经过激烈讨论，各施所长，分工如下。
+
+``` mermaid
+graph TB
+A==重点==>A1
+B-->B1
+B==重点==>B2
+B-.偶尔涉及.->A1
+C-->C1
+C==重点==>C2
+
+subgraph 人员 
+			A(俊煲)
+			B(众铭)
+			C(海桐)
+end
+subgraph 任务
+			A1[摄像头的图像处理]
+			B1[机械臂各个模块组装]
+			B2[代码调试及实现]
+			C1[正运动学分析]
+			C2[逆运动学分析]
+end
+```
+
+### 未完待续
+
+.md **源码**欢迎补充修改
