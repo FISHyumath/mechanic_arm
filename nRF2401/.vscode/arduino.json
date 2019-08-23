@@ -1,0 +1,4 @@
+{
+    "sketch": "transmit.ino",
+    "board": "arduino:avr:uno"
+}

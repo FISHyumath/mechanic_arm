@@ -1,0 +1,4 @@
+{
+    "sketch": "try_connect.ino",
+    "board": "arduino:avr:uno"
+}
