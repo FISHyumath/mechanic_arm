@@ -1,8 +1,9 @@
 bool catch_valid = false;
 double X, Y, Z, L; //以腰部舵机中心建立坐标系，直角坐标系与柱坐标系相互转换
 byte theta;     //底盘的极角，极轴以底盘舵机90˚方向，theta为弧度制
+byte angle_alpha;
 //X = L * cos(theta); Y = L * sin(theta);
-String Z_store = "", L_store = "", theta_store = "", STORE = "";
+String Z_store = "", L_store = "", theta_store = "", STORE = "", alpha_store = "";
 
 void setup()
 {
@@ -20,7 +21,7 @@ void input_scheme() //调试时使用的向Serial中输入
   double stringToDouble(const String &);
   char data; //字符型数据
   char *data_store;
-  int data_length, index[2], j = 0;
+  int data_length, index[3], j = 0;
   while (Serial.available() > 0) //读取字符串
   {
     data = Serial.read(); //读取数据
@@ -43,23 +44,29 @@ void input_scheme() //调试时使用的向Serial中输入
     }
     Z_store = STORE.substring(0, index[0]); //读取子字符串
     L_store = STORE.substring(index[0] + 1, index[1]);
-    theta_store = STORE.substring(index[1] + 1, data_length - 2);
+    theta_store = STORE.substring(index[1] + 1, index[2]);
+    alpha_store = STORE.substring(index[2] + 1, data_length - 2);
 
     Z = stringToDouble(Z_store);
     L = stringToDouble(L_store);
     theta = stringToDouble(theta_store);
+    angle_alpha = stringToDouble(alpha_store);
     Serial.print("Z is: ");
     Serial.println(Z);
     Serial.print("L is: ");
     Serial.println(L);
     Serial.print("theta is: ");
     Serial.println(theta);
+    Serial.print("alpha is: ");
+    Serial.println(angle_alpha);
+    catch_valid = true;
   }
   else
   {
     catch_valid = false;
   }
   STORE = ""; //置为空，等待下一次读取
+  delete data_store;
 }
 
 double stringToDouble(const String &str)
