@@ -50,7 +50,9 @@
 #define B digitalRead(3)  //B按键SW2
 #define C digitalRead(4)  //C按键SW3
 #define D digitalRead(5)  //D按键SW4
-#define KEY digitalRead(6)  //按下操纵杆
+#define E digitalRead(6)  //按下E
+#define F digitalRead(7)  //按下F
+#define KEY digitalRead(8) //按下KEY
 
 byte TX_ADDRESS[TX_ADR_WIDTH] =
 {
@@ -106,18 +108,28 @@ void loop()
     Serial.print("D is push\n");
   }
   else tx_buf[5] = 0;
+  if (E == 0)
+  {
+    tx_buf[6] = 0xFF;
+    Serial.print("E is print\n");
+  }
+  if (F == 0)
+  {
+    tx_buf[7] = 0xFF;
+    Serial.print("F is pufh\n");
+  }
   if (KEY == 0)
   {
     tx_buf[6] = 0xFF;
     Serial.print("KEY is push\n");
   }
   TX_DATA();  //发送数据包
-  if (X > 250 || X < 10)
+  if (X > 160 || X < 10)
   {
     Serial.print("X is: ");
     Serial.println(X);
   }
-  if (Y > 250 || Y < 10)
+  if (Y > 160 || Y < 10)
   {
     Serial.print("Y is: ");
     Serial.println(Y);

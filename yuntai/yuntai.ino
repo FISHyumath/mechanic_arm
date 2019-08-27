@@ -17,7 +17,7 @@ void setup()
 }
 
 void loop()
-[
+{
     digitalWrite(trig,1);   //置高电平
     delayMicroseconds(15);
     digitalWrite(trig,0);   //设置为低点评
@@ -41,4 +41,4 @@ void loop()
         }
     }
     delay(500);
-]
+}

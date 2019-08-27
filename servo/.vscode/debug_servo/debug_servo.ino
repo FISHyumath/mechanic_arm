@@ -6,7 +6,7 @@ void setup()
 {
     Serial.begin(9600);
     Serial.println("Begin your debug!!");
-    angle = 0
+    angle = 0;
     ss.attach(3);
     ss.write(angle);
     delay(15);
@@ -41,5 +41,4 @@ void loop()
         delay(15);
         rotation_way = true;
     }
-
 }

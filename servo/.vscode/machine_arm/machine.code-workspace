@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "/Users/fishming/Documents/Arduino"
+		},
+		{
+			"name": "machine_arm_motion",
+			"path": "/Users/fishming/Documents/PlatformIO/Projects/machine_arm_motion"
+		}
+	],
+	"settings": {
+		"terminal.integrated.env.osx": {
+			"PATH": "/Users/fishming/.platformio/penv/bin:/Users/fishming/.platformio/penv:/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/VMware Fusion.app/Contents/Public:/Library/TeX/texbin:/usr/local/share/dotnet:~/.dotnet/tools:/Library/Frameworks/Mono.framework/Versions/Current/Commands:/Applications/Xamarin Workbooks.app/Contents/SharedSupport/path-bin",
+			"PLATFORMIO_CALLER": "vscode"
+		}
+	}
+}

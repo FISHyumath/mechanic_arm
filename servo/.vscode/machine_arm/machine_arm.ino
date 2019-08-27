@@ -1,5 +1,8 @@
 #include <Servo.h>
-const int pi = 3.1415926;
+#include <Arduino.h>
+#include <HardwareSerial.h>
+
+const double pi = 3.1415926;
 
 class Angle
 {
@@ -60,7 +63,74 @@ double X = 0, Y = 0, Z = 0, L = 0, Zp = 0; //以腰部舵机中心建立坐标�
 int angle_alpha; //机械手相对竖直方向z轴的俯仰角，逆时针方向，0-180,根据物体状态判别输入
 int theta;       //底盘的极角，极轴以底盘舵机0˚方向为标准，theta为角度制，0-180˚
 String Z_store = "", L_store = "", theta_store = "", STORE = "", alpha_store = "";
+//拍照动作
+int move_photo[9] =
+    {
+        70, 50, 10,
+        50, 70, 50,
+        -15, 90, 70};
+//动作一 预备抓取
+int move_first[12] =
+    {
+        0, 0, 0,
+        10, 20, 30,
+        30, 35, 60,
+        45, 45, 90};
+//抓取340mm
+int moveCatch340[12] =
+    {
+        45, 45, 90,
+        55, 42, 60,
+        75, 38, 20,
+        90, 35, -15};
 
+//320mm抓取
+int moveCatch320[12] =
+    {
+        45, 45, 90,
+        60, 53, 60,
+        70, 50, 30,
+        80, 70, -45};
+//抓取300mm处
+int moveCatch300[12] =
+    {
+        45,45,90,
+        55,50,40,
+        75,30,-10,
+        85,60,-60
+};
+//抓取280mm
+int moveCatch280[12] =
+    {
+      45,45,90,
+      55,60,40,
+      65,75,-10,
+      70,90,-60
+};
+//抓取260mm
+int moveCatch260[12] =
+    {
+      45,45,90,
+      47,50,60,
+      52,60,35,
+      55,65,15
+};
+//抓取240mm
+int moveCatch240[12] =
+    {
+      45,45,90,
+      42,55,70,
+      38,63,40,
+      35,70,25
+};
+//抓取220mm
+int moveCatch220[12] =
+    {
+      45,45,90,
+      45,50,75,
+      45,56,60,
+      45,62,45
+};
 /*用机械臂长度近似舵机中心之间的距离*/
 double arm_l1 = 105.14;    // 机械臂腰部到肩部的距离，单位mm(杆轴中心点到中心点，精确，下同）
 double arm_l2 = 89.90;     // 机械臂的大臂长度
@@ -238,4 +308,115 @@ double stringToDouble(const String &str) //将string转换成为字符串，调�
     returnValue += double(str[index] - '0') / (double)pow(10, (index - dotIndex));
   }
   return returnValue;
+}
+void Move_first() //运动至预备位置
+{
+  int move_count1 = 0;
+  for (int i = 0; i < 4; i++)
+  {
+    angle[i + 1].changeAngle(byte(90 + move_first[3 * move_count1 + i]));
+    angle[i + 1].angleReach(servo[i + 1]);
+  }
+  move_count1++;
+  if (move_count1 >= 4)
+  {
+    move_count1 = 0;
+  }
+}
+
+void catchMotion()
+{
+  int move = 0; //路径计数，记录已经走过的坐标
+  int * moveArray;
+  moveArray = new int[12];
+  if(L <= 350 && L > 330)
+  {
+    moveArray = moveCatch340; //分配地址
+  }
+  else if(L <= 330 && L > 310)
+  {
+    moveArray = moveCatch320;
+  }
+  else if(L <= 310 && L >290)
+  {
+    moveArray = moveCatch300;
+  }
+  else if(L <= 290 && L > 270)
+  {
+    moveArray = moveCatch280;
+  }
+  else if(L <= 270 && L > 250)
+  {
+    moveArray = moveCatch260;
+  }
+  else if(L <= 250 && L > 230)
+  {
+    moveArray = moveCatch240;
+  }
+  else if(L <= 230 && L > 210)
+  {
+    moveArray = moveCatch220;
+  }
+  else
+  {
+    Serial.println("Cannot Reach!!!");
+  }
+  
+  for (int i = 0; i < 4; i++)
+  {
+    angle[i + 1].changeAngle(byte(90 + moveArray[3 * move + i]));
+    angle[i + 1].angleReach(servo[i + 1]);
+    move++;
+  }
+  if(move >= 4)
+  {
+    move = 0;
+  } 
+  delete moveArray;
+}
+
+void catch_320() //抓320mm处的物体
+{
+  int move_catch_count2 = 0;
+  for (int i = 0; i < 4; i++)
+  {
+    angle[i + 1].changeAngle(byte(90 + moveCatch320[3 * move_catch_count2 + i]));
+    angle[i + 1].angleReach(servo[i + 1]);
+  }
+  move_catch_count2++;
+  if (move_catch_count2 >= 4)
+  {
+    move_catch_count2 = 0;
+  }
+}
+
+void Move_to_camera()
+{
+  int move_catch_count2 = 0;
+  theta = 90;
+  angle[0].changeAngle(theta);
+  angle[0].angleReach(servo[0]);
+  int move_photo_count = 0;
+  for (int i = 0; i < 3; i++)
+  {
+    angle[i + 1].changeAngle(byte(90 + move_photo[3 * move_photo_count + i]));
+    angle[i + 1].angleReach(servo[i + 1]);
+  }
+  move_photo_count++;
+  if (move_photo_count >= 3)
+  {
+    move_photo_count = 0;
+  }
+}
+
+void moveBack()
+{
+  for (int i = 0; i < 3; i++)
+  {
+    angle[i + 1].changeAngle(90);
+  }
+  for (int i = 0; i < 3; i++)
+  {
+    angle[i + 1].angleReach(servo[i + 1]);
+  }
 }
