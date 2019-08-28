@@ -21,7 +21,7 @@ std::string Z_store = "", L_store = "", theta_store = "", STORE = "", alpha_stor
 /*用机械臂长度近似舵机中心之间的距离*/
 double arm_l1 = 105.14;    // 机械臂腰部到肩部的距离，单位mm(杆轴中心点到中心点，精确，下同）
 double arm_l2 = 89.90;     // 机械臂的大臂长度
-double arm_l3 = 169.74;   //156 数据更改 103.74 + 65 = 169.74 //机械臂的小臂长度，杆轴中心点到4号舵机轴的中心点，近似
+double arm_l3 = 169.74;   //156 数据更改 103.74 + 65 = 169.74
 double up_to_land = 91.80; //1号舵机中心距离地面的高度,近似
 bool catch_valid = false;  //判断是否可以抓取，有输入才可以启动抓取(debug模式)
 Matrix ServoDH[5];
@@ -118,17 +118,18 @@ void catchit() //控制机械手实现抓取
     printf("%d\n", angle_tmp[2]);
     printf("The angle 3 is: ");
     printf("%d\n", angle_tmp[3]);
+    /*
     double T0[4][4] =
     {
         cos(theta * pi / 180),-sin(theta * pi / 180),0,0,
         sin(theta * pi / 180),cos(theta * pi / 180),0,0,
-        0,0,1,up_to_land,
+        0,0,1,0,
         0,0,0,1
     };
     double T1[4][4] =
     {
         cos(angle_tmp[1] * pi / 180),-sin(angle_tmp[1] * pi / 180),0,0,
-        0,0,-1,0,
+        0,0,-1,-up_to_land,
         sin(angle_tmp[1] * pi / 180),cos(angle_tmp[1] * pi / 180),0,0,
         0,0,0,1
     };
@@ -153,7 +154,6 @@ void catchit() //控制机械手实现抓取
         0,0,1,0,
         0,0,0,1
     };
-    
     ServoDH[0].input(T0);
     ServoDH[1].input(T1);
     ServoDH[2].input(T2);
@@ -165,13 +165,18 @@ void catchit() //控制机械手实现抓取
         TT = TT * ServoDH[i];
     }
     TT = TT * v1;
-    std::cout << "最后的三维坐标实际是" << std::endl;
-    std::cout << TT;
+    */
+    double x_compute = 0,y_compute = 0,z_compute = 0,l_compute = 0;
+    l_compute = sin(angle_tmp[1] * pi / 180) * arm_l1 + sin((angle_tmp[1] + angle_tmp[2]) * pi /180) * arm_l2 + sin((angle_tmp[1] + angle_tmp[2] + angle_tmp[3]) * pi /180) * arm_l3;
+    z_compute = cos(angle_tmp[1] * pi / 180) * arm_l1 + cos((angle_tmp[1] + angle_tmp[2]) * pi /180) * arm_l2 + cos((angle_tmp[1] + angle_tmp[2] + angle_tmp[3]) * pi /180) * arm_l3 + up_to_land;
+    x_compute = l_compute * cos(theta * pi / 180);
+    y_compute = l_compute * sin(theta * pi / 180);
+    
+    std::cout << "最后的三维坐标实际是"<< "X: " <<x_compute<< "\nY: "<<y_compute<<"\nZ: "<<z_compute<<std::endl;
     angle[0].changeAngle(theta);
     angle[1].changeAngle(angle_tmp[1] + 90);
     angle[2].changeAngle(-angle_tmp[2] + 90);
     angle[3].changeAngle(angle_tmp[3] + 90);
-    angle[5].changeAngle(theta);
     for (int i = 0; i < 6; i++)
     {
         angle[i].angleReach(servo[i]);

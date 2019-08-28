@@ -66,6 +66,10 @@ void input_scheme() //调试时使用的向Serial中输入
     catch_valid = false;
   }
   STORE = ""; //置为空，等待下一次读取
+  Z_store = "";
+  L_store = "";
+  theta_store = "";
+  alpha_store = "";
   delete data_store;
 }
 

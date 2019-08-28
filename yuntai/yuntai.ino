@@ -1,5 +1,5 @@
 #include "Servo.h"
-const int servoPWM = 1;
+const int servoPWM = 12;
 const int trig = 8;
 const int echo = 9;
 Servo yun_servo;
@@ -41,4 +41,8 @@ void loop()
         }
     }
     delay(500);
+}
+void getEchoLength()
+{
+    
 }

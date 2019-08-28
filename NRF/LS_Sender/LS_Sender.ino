@@ -1,4 +1,3 @@
-#include <SoftwareSerial.h>
 
 //发射端程序
 
@@ -8,46 +7,49 @@
 #include <MirfSpiDriver.h>
 #include <nRF24L01.h>
 
-char test[100];
-int cnt;
-
-int value;
-
-SoftwareSerial mySerial(2, 3);
 
 void setup()
 {
-  
-  Mirf.spi = &MirfHardwareSpi;
-  Mirf.init();
-  Mirf.setRADDR((byte *)"ABCDE"); //设置自己的地址（发送端地址），使用5个字符
-  Mirf.payload = sizeof(value);
-  Mirf.channel = 50;              //设置所用信道
-  Mirf.config();
-  mySerial.begin(9600);
-  Serial.begin(9600);
-  Mirf.setTADDR((byte *)"FGHIJ");
+    Serial.begin(9600);
+ 
+    Mirf.cePin = 9;                //设置CE引脚为D9
+    Mirf.csnPin = 10;        //设置CE引脚为D10
+    Mirf.spi = &MirfHardwareSpi;
+    Mirf.init();  //初始化nRF24L01                
+ 
+        //设置接收标识符"Sen01"
+    Mirf.setRADDR((byte *)"Sen01");
+    //设置一次收发的字节数，这里发一个整数，写sizeof(unsigned int)，实际等于2字节
+    Mirf.payload = sizeof(unsigned int);
+    //发送通道，可以填0~128，收发必须一致。
+    Mirf.channel = 3;
+    Mirf.config();
+ 
+        //注意一个Arduino写Sender.ino，另一个写Receiver.ino。
+        //这里标识写入了Sender.ino
+    Serial.println("I'm Sender...");
 }
-
+unsigned int adata = 0;
 void loop()
 {
-  if (mySerial.available())
-  {
-    Mirf.setTADDR((byte *)"FGHIJ");           //设置接收端地址                     //0-255的随机数
-    Mirf.send(char (mySerial.read()));
-    while(Mirf.isSending()) delay(1); //直到发送成功，退出循环
-    //Serial.print(char (mySerial.read())); 
-  }
-  
-  //Mirf.setTADDR((byte *)"FGHIJ");           //设置接收端地址
-  //value = random(255);                      //0-255的随机数
-  //for (int i=0;i<cnt;i++)
- // {
-  //  Mirf.send(test[i]);
-  //  while(Mirf.isSending()) delay(1); //直到发送成功，退出循环
-  //}
-  //delay(1000);
-  
-  
-
+        //读取A0值到adata
+    adata = analogRead(A0);
+ 
+    //由于nRF24L01只能以byte单字节数组形式发送Mirf.payload个数据，
+    //所以必须将所有需要传输的数据拆成byte。
+    //下面定义byte数组，存放待发数据，因为Mirf.payload = sizeof(unsigned int);
+    //实际下面等于byte data[2];
+    byte data[Mirf.payload];
+ 
+    //adata是unsigned int双字节数据，必须拆开。
+    //将adata高低八位拆分：
+    data[0] = adata & 0xFF;                //低八位给data[0]，
+    data[1] = adata >> 8;                //高八位给data[1]。
+ 
+    //设置向"serv1"发送数据
+    Mirf.setTADDR((byte *)"Rec01");
+    Mirf.send(data);
+    //while死循环等待发送完毕，才能进行下一步操作。
+    while(Mirf.isSending()) {}
+    delay(20);
 }

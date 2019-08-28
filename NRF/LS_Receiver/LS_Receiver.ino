@@ -10,24 +10,55 @@
 
 int value;
 
+ //定义一个变量adata存储最终结果,oldadata存储旧结果，防止相同结果刷屏。
+    unsigned int adata = 0, oldadata = 0;
+ 
 void setup()
 {
-  Serial.begin(9600);
-  Mirf.spi = &MirfHardwareSpi;
-  Mirf.init();
-  Mirf.setRADDR((byte *)"FGHIJ"); //设置自己的地址（接收端地址），使用5个字符
-  Mirf.payload = sizeof(value);   
-  Mirf.channel = 50;   //设置使用的信道
-  Mirf.config(); 
-  Serial.println("Listening...");  //开始监听接收到的数据
+    Serial.begin(9600);
+ 
+    //---------初始化部分，不可随时修改---------
+    Mirf.cePin = 9;     //设置CE引脚为D9
+    Mirf.csnPin = 10;   //设置CE引脚为D10
+    Mirf.spi = &MirfHardwareSpi;
+    Mirf.init();  //初始化nRF24L01
+ 
+    //---------配置部分，可以随时修改---------
+    //设置接收标识符"Rev01"
+    Mirf.setRADDR((byte *)"Rec01");
+    //设置一次收发的字节数，这里发一个整数，
+    //写sizeof(unsigned int)，实际等于2字节
+    Mirf.payload = sizeof(unsigned int);
+    //发送通道，可以填0~128，收发必须一致。
+    Mirf.channel = 3;
+    Mirf.config();
+ 
+    //注意一个Arduino写Sender.ino，另一个写Receiver.ino。
+    //这里用来辨别写入了Receiver.ino程序
+    Serial.println("I'm Receiver...");
 }
-
+ 
 void loop()
 {
-  if(Mirf.dataReady()) 
-  {  //当接收到程序，便从串口输出接收到的数据
-    Mirf.getData((byte *) &value);
-    Serial.print("Got data: ");
-    Serial.println(value);
-  }
+    //定义一个暂存数组，大小为Mirf.payload。
+    byte data[Mirf.payload];
+    if(Mirf.dataReady())    //等待接收数据准备好
+    {
+        Mirf.getData(data);    //接收数据到data数组
+        //data[1]<左移8位与data[0]并，重组数据。
+        adata = (unsigned int)((data[1] << 8) | data[0]);
+ 
+        //与上一次结果比较，避免相同结果刷屏,降低串口流量
+        if(adata != oldadata)
+        {
+            oldadata = adata; //本次结果作为历史结果。
+            //Serial.print输出数据
+            Serial.print("A0=");
+            Serial.println(adata);
+            //也可以输出双字节数据
+            //Serial.write(data[1]);
+            //Serial.write(data[0]);
+        }
+ 
+    }
 }
