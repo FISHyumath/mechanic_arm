@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "absolute:Users/fishming/Documents/&#x8ba1;&#x7b97;&#x673a;&#x7a0b;&#x5e8f;&#x8bbe;&#x8ba1;/&#x7a0b;&#x5e8f;/debug/debug/manager.cpp">
+   </FileRef>
+   <FileRef
+      location = "absolute:Users/fishming/Documents/&#x8ba1;&#x7b97;&#x673a;&#x7a0b;&#x5e8f;&#x8bbe;&#x8ba1;/&#x7a0b;&#x5e8f;/debug/debug/manager.hpp">
+   </FileRef>
+   <FileRef
+      location = "absolute:Users/fishming/Documents/&#x8ba1;&#x7b97;&#x673a;&#x7a0b;&#x5e8f;&#x8bbe;&#x8ba1;/&#x7a0b;&#x5e8f;/debug/debug/person.hpp">
+   </FileRef>
+   <FileRef
+      location = "absolute:Users/fishming/Documents/&#x8ba1;&#x7b97;&#x673a;&#x7a0b;&#x5e8f;&#x8bbe;&#x8ba1;/&#x7a0b;&#x5e8f;/debug/debug/salemanager.cpp">
+   </FileRef>
+   <FileRef
+      location = "absolute:Users/fishming/Documents/&#x8ba1;&#x7b97;&#x673a;&#x7a0b;&#x5e8f;&#x8bbe;&#x8ba1;/&#x7a0b;&#x5e8f;/debug/debug/salemanager.hpp">
+   </FileRef>
+   <FileRef
+      location = "container:Users/fishming/Documents/&#x8ba1;&#x7b97;&#x673a;&#x7a0b;&#x5e8f;&#x8bbe;&#x8ba1;/&#x7a0b;&#x5e8f;/debug/debug/salesman.cpp">
+   </FileRef>
+   <FileRef
+      location = "absolute:Users/fishming/Documents/&#x8ba1;&#x7b97;&#x673a;&#x7a0b;&#x5e8f;&#x8bbe;&#x8ba1;/&#x7a0b;&#x5e8f;/debug/debug/salesman.hpp">
+   </FileRef>
+   <FileRef
+      location = "absolute:Users/fishming/Documents/&#x8ba1;&#x7b97;&#x673a;&#x7a0b;&#x5e8f;&#x8bbe;&#x8ba1;/&#x7a0b;&#x5e8f;/debug/debug/technician.cpp">
+   </FileRef>
+   <FileRef
+      location = "absolute:Users/fishming/Documents/&#x8ba1;&#x7b97;&#x673a;&#x7a0b;&#x5e8f;&#x8bbe;&#x8ba1;/&#x7a0b;&#x5e8f;/debug/debug/technician.hpp">
+   </FileRef>
+   <FileRef
+      location = "self:">
+   </FileRef>
+</Workspace>
